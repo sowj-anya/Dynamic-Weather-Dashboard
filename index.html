@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WeatherPro - Advanced Weather App</title>
+        <meta name="theme-color" content="#0f2027">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="manifest" href="manifest.json">
+</head>
+
+<body class="theme-fog theme-night">
+    <header>
+        <div class="brand">
+            <i class="fas fa-cloud-sun fa-lg"></i>
+            <h1>WeatherPro</h1>
+        </div>
+        <nav>
+            <a href="#current" aria-label="Go to Current Weather section">Current</a>
+            <a href="#forecast" aria-label="Go to Forecast section">Forecast</a>
+            <a href="#about" aria-label="Go to About section">About</a>
+        </nav>
+        <div class="settings-toggles">
+            <div class="unit-toggle" id="unitToggleContainer">
+                <span class="unit-label">°C</span>
+                <label class="switch" aria-label="Toggle temperature unit between Celsius and Fahrenheit">
+                    <input type="checkbox" id="unitToggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="unit-label">°F</span>
+            </div>
+            <button id="settingsBtn" class="neumorphic" aria-haspopup="dialog" aria-controls="settingsModal" title="Open settings"><i class="fas fa-gear"></i></button>
+        </div>
+    </header>
+
+    <main>
+        <section id="alertsBanner" class="alerts-banner" aria-live="polite" aria-atomic="true" style="display:none;"></section>
+        <section id="savedLocations" class="saved-locations-section" aria-label="Saved locations"></section>
+
+        <section class="search-section" aria-label="Search for weather">
+            <input type="text" id="cityInput" placeholder="Enter city name" aria-label="City name input" autocomplete="off">
+            <button id="searchBtn" class="neumorphic" aria-label="Get weather for city" title="Get weather for entered city">Get Weather</button>
+            <button id="locBtn" class="neumorphic" title="Get weather for my current location" aria-label="Get weather for current location">
+                <i class="fas fa-location-arrow"></i>
+            </button>
+            <div id="autocompleteList" class="autocomplete-list" role="listbox" aria-label="City suggestions" style="display:none;"></div>
+            <button id="shareLinkBtn" class="neumorphic" title="Copy shareable link" aria-label="Copy shareable link"><i class="fas fa-link"></i></button>
+        </section>
+
+        <section id="current" class="weather-display neumorphic" tabindex="0" aria-live="polite" aria-atomic="true" aria-label="Current weather information">
+          <p class="city-name">Coimbatore, India</p>
+          <img class="weather-icon" src="https://cdn.weatherapi.com/weather/64x64/night/143.png" alt="Mist">
+          <div id="moonEmoji" class="moon-phase-emoji" aria-label="Waning Gibbous, 71% illuminated" title="Waning Gibbous • 71% illuminated">🌖</div>
+          <p class="temp">79°F</p>
+          <p class="description">Mist</p>
+          <div class="weather-details">
+              <div class="detail-item"><strong>Feels Like</strong> 85°F</div>
+              <div class="detail-item"><strong>Humidity</strong> 79%</div>
+              <div class="detail-item"><strong>Wind</strong> 9.8 mph SW (gusts 15.8 mph)</div>
+              <div class="detail-item"><strong>UV Index</strong> <span class="rating-good">Low</span></div>
+              <div class="detail-item"><strong>AQI</strong> <span class="rating-good">Good</span></div>
+              <div class="detail-item"><strong>Sunrise</strong> 06:12 AM</div>
+              <div class="detail-item"><strong>Sunset</strong> 06:25 PM</div>
+              <div class="detail-item"><strong>Dew Point</strong> 72°F</div>
+              <div class="detail-item"><strong>Visibility</strong> 3 mi</div>
+              <div class="detail-item"><strong>Pressure</strong> 1012 hPa <span title="Rising 1 mb">↗</span></div>
+              <div class="detail-item"><strong>Moon</strong> Waning Gibbous</div>
+          </div>
+          <div class="aqi-breakdown"><div class="aq-parts"><span>PM2.5: 31.3</span> • <span>PM10: 48.3</span> • <span>NO₂: 9.4</span> • <span>O₃: 75.0</span> • <span>SO₂: 6.5</span></div></div>
+      </section>
+
+        
+
+        <!-- Hourly forecast cards -->
+        <section id="hourly-forecast" class="hourly-forecast-display">
+            <h2>Hourly Forecast</h2>
+            <div class="hourly-tabs" id="hourlyTabs" role="tablist" aria-label="Select day for hourly forecast"><button class="map-btn active" role="tab">Fri</button><button class="map-btn " role="tab">Sat</button><button class="map-btn " role="tab">Sun</button></div>
+            <div class="hourly-container" id="hourlyContainer"><div class="hourly-item neumorphic good-hour">
+              <div>23:00</div>
+              <img class="hourly-icon" src="https://cdn.weatherapi.com/weather/64x64/night/116.png" alt="Partly Cloudy ">
+              <div class="hourly-temp">74°F</div>
+              <div class="hourly-extra">PoP 0% • Cloud 50%</div>
+          </div></div>
+            <div class="hourly-sparkline"><canvas id="hourlySparkline" height="100" style="box-sizing: border-box; display: block; height: 80px; width: 902px;" width="1128"></canvas></div>
+        </section>
+
+        <!-- Daily forecast cards -->
+        <section id="forecast" class="forecast-display"><div class="forecast-card neumorphic">
+              <div class="forecast-day">Fri</div>
+              <img class="forecast-icon" src="https://cdn.weatherapi.com/weather/64x64/day/302.png" alt="Moderate rain">
+              <div class="forecast-temp">
+                  <strong>86°F</strong> / 73°F
+              </div>
+              <div class="forecast-condition">Moderate rain</div>
+          </div><div class="forecast-card neumorphic">
+              <div class="forecast-day">Sat</div>
+              <img class="forecast-icon" src="https://cdn.weatherapi.com/weather/64x64/day/176.png" alt="Patchy rain nearby">
+              <div class="forecast-temp">
+                  <strong>87°F</strong> / 72°F
+              </div>
+              <div class="forecast-condition">Patchy rain nearby</div>
+          </div><div class="forecast-card neumorphic">
+              <div class="forecast-day">Sun</div>
+              <img class="forecast-icon" src="https://cdn.weatherapi.com/weather/64x64/day/116.png" alt="Partly Cloudy ">
+              <div class="forecast-temp">
+                  <strong>87°F</strong> / 70°F
+              </div>
+              <div class="forecast-condition">Partly Cloudy </div>
+          </div></section>
+
+        <!-- Weather History & Trends -->
+        <section id="history" class="neumorphic" aria-label="Weather history for past 7 days" style="padding:14px;">
+            <h2>Weather History (7 days)</h2>
+            <canvas id="historyChart" height="300" style="box-sizing: border-box; display: block; height: 240px; width: 938px;" width="1173"></canvas>
+            <div id="historyError" style="display:none; color: var(--danger); text-align:center; margin-top:8px;"></div>
+            <div class="history-actions">
+                <button id="compareToggleBtn" class="neumorphic" aria-expanded="false">Compare cities</button>
+                <div id="comparePanel" class="compare-panel" style="display:none;">
+                    <div id="compareCitiesList" class="compare-cities-list" aria-label="Select cities to compare"></div>
+                    <button id="applyCompareBtn" class="neumorphic">Apply</button>
+                </div>
+                <button id="exportCsvBtn" class="neumorphic">Export CSV</button>
+                <button id="shareImageBtn" class="neumorphic">Share image</button>
+                <span id="staleBadge" class="stale-badge" style="display: none;" title="Showing cached data">Stale</span>
+            </div>
+        </section>
+
+        <section id="lifestyle-section" class="lifestyle-container" style="display: grid;">
+            <div id="activities-section" class="neumorphic">
+                <h2>Activities</h2>
+                <div class="activities-grid"><div class="activity-item neumorphic"><i class="fas fa-person-running"></i><span class="item-title">Running</span><span class="rating-good">Good</span></div><div class="activity-item neumorphic"><i class="fas fa-person-hiking"></i><span class="item-title">Hiking</span><span class="rating-good">Good</span></div><div class="activity-item neumorphic"><i class="fas fa-person-biking"></i><span class="item-title">Biking</span><span class="rating-good">Good</span></div><div class="activity-item neumorphic"><i class="fas fa-tree"></i><span class="item-title">Outdoor</span><span class="rating-good">Good</span></div></div>
+            </div>
+            <div id="allergies-section" class="neumorphic">
+                <h2>Allergies</h2>
+                <div class="allergies-grid"><div class="allergy-item neumorphic"><i class="fas fa-wind"></i><span class="item-title">Airborne Pollutants</span><span class="rating-good">Low</span></div></div>
+            </div>
+            <div id="suggestions-section" class="neumorphic">
+                <h2>Suggestions</h2>
+                <div id="suggestionsList"><div class="suggestion-item">Good hours for outdoor activities: 08:00, 09:00, 17:00</div></div>
+            </div>
+        </section>
+
+        <section id="map-section" class="map-container neumorphic" style="display: block;">
+            <h2>Live Weather Map</h2>
+            <div class="map-controls">
+                <button class="map-btn neumorphic" data-layer="rain">Radar</button>
+                <button class="map-btn neumorphic" data-layer="clouds">Clouds</button>
+                <button class="map-btn neumorphic" data-layer="temp">Temperature</button>
+                <label class="opacity-label">Opacity <input type="range" id="layerOpacity" min="0" max="1" step="0.05" value="0.7"></label>
+                <div class="map-search">
+                    <input type="text" id="mapSearchInput" placeholder="Search on map" aria-label="Map search">
+                    <button id="mapSearchBtn" class="neumorphic active" aria-label="Search on map"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div id="windy-map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom owm-layer-radar" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(-117px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://c.tile.openstreetmap.org/9/365/240.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(463px, 156px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/365/239.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(463px, -100px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/364/240.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(207px, 156px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/366/240.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(719px, 156px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/365/241.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(463px, 412px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/364/239.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(207px, -100px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/366/239.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(719px, -100px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/364/241.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(207px, 412px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/366/241.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(719px, 412px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/363/240.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-49px, 156px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/367/240.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(975px, 156px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/363/239.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-49px, -100px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/367/239.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(975px, -100px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/363/241.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-49px, 412px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/367/241.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(975px, 412px, 0px); opacity: 1;"></div></div><div class="leaflet-layer owm-tiles owm-undefined" style="z-index: 1; opacity: 0.7;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/365/240.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(463px, 156px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/365/239.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(463px, -100px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/364/240.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(207px, 156px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/366/240.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(719px, 156px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/365/241.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(463px, 412px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/364/239.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(207px, -100px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/366/239.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(719px, -100px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/364/241.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(207px, 412px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/366/241.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(719px, 412px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/363/240.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-49px, 156px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/367/240.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(975px, 156px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/363/239.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-49px, -100px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/367/239.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(975px, -100px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/363/241.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-49px, 412px, 0px); opacity: 1;"><img alt="" src="https://tile.openweathermap.org/map/precipitation/9/367/241.png?appid=0ec27aacec1774f2c8a3385c3f1bb395" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(975px, 412px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"><img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png" class="leaflet-marker-shadow leaflet-zoom-animated" alt="" style="margin-left: -12px; margin-top: -41px; width: 41px; height: 41px; transform: translate3d(1788px, -552px, 0px);"></div><div class="leaflet-pane leaflet-marker-pane"><img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -12px; margin-top: -41px; width: 25px; height: 41px; transform: translate3d(1788px, -552px, 0px); z-index: -552;"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(93557px, 61509px, 0px) scale(256);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> © OpenStreetMap contributors</div></div></div></div>
+            <div id="mapLegend" class="map-legend" aria-live="polite">Radar reflectivity (precipitation)</div>
+        </section>
+
+        <section id="about" class="about-section neumorphic" tabindex="0">
+            <h2>About WeatherPro</h2>
+            <p>
+                WeatherPro is your professional weather assistant, designed for accuracy, accessibility, and style.
+                Built using modern web technologies, it provides real-time data, forecasts, activity ratings, and a
+                live, interactive weather map from Windy.com.
+            </p>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Real-time data with hourly updates</li>
+                <li><i class="fas fa-check-circle"></i> Unit conversion (Celsius/Fahrenheit)</li>
+                <li><i class="fas fa-check-circle"></i> Advanced interactive weather map</li>
+                <li><i class="fas fa-check-circle"></i> Accessible and responsive Neumorphic UI</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="neumorphic">
+        <nav class="footer-nav" aria-label="Footer navigation">
+            <a href="#current">Current</a>
+            <a href="#forecast">Forecast</a>
+            <a href="#about">About</a>
+        </nav>
+        <p>© 2025 WeatherPro. All rights reserved.</p>
+    </footer>
+
+    <div class="loader" id="loader" aria-live="assertive" aria-label="Loading indicator" style="display: none;"></div>
+
+    <!-- Global weather animations overlay -->
+    <div id="weather-anim" aria-hidden="true"><div class="star" style="left: 28.8949vw; top: 36.9781vh; width: 2.46642px; height: 2.46642px; animation-duration: 4.18068s, 20.008s; animation-delay: 1.93118s, 6.63176s;"></div><div class="star" style="left: 73.9669vw; top: 58.9377vh; width: 1.30542px; height: 1.30542px; animation-duration: 6.72248s, 25.1196s; animation-delay: 3.46445s, 0.539864s;"></div><div class="star" style="left: 8.05224vw; top: 41.0145vh; width: 0.737781px; height: 0.737781px; animation-duration: 9.67768s, 12.3477s; animation-delay: 2.09679s, 8.98431s;"></div><div class="star" style="left: 23.1483vw; top: 5.70699vh; width: 1.90524px; height: 1.90524px; animation-duration: 7.23258s, 25.2267s; animation-delay: 3.47086s, 6.98183s;"></div><div class="star" style="left: 59.9079vw; top: 63.2944vh; width: 1.35503px; height: 1.35503px; animation-duration: 5.17213s, 20.2269s; animation-delay: 5.44361s, 0.0170765s;"></div><div class="star" style="left: 33.8446vw; top: 76.3734vh; width: 1.27316px; height: 1.27316px; animation-duration: 9.68641s, 15.2109s; animation-delay: 2.75125s, 1.04873s;"></div><div class="star" style="left: 63.6208vw; top: 12.3039vh; width: 1.8303px; height: 1.8303px; animation-duration: 6.64971s, 27.5549s; animation-delay: 5.1336s, 7.67906s;"></div><div class="star" style="left: 13.9615vw; top: 94.546vh; width: 1.92542px; height: 1.92542px; animation-duration: 5.89332s, 24.5632s; animation-delay: 0.553485s, 9.84943s;"></div><div class="star" style="left: 33.0335vw; top: 32.8365vh; width: 1.08583px; height: 1.08583px; animation-duration: 9.98645s, 23.2627s; animation-delay: 2.05103s, 8.68997s;"></div><div class="star" style="left: 85.3646vw; top: 29.6552vh; width: 0.796498px; height: 0.796498px; animation-duration: 6.66178s, 12.2951s; animation-delay: 5.75698s, 7.72153s;"></div><div class="star" style="left: 97.7949vw; top: 37.3134vh; width: 2.75673px; height: 2.75673px; animation-duration: 4.84999s, 27.4435s; animation-delay: 0.668484s, 0.00779006s;"></div><div class="star" style="left: 94.0577vw; top: 21.2802vh; width: 3.0206px; height: 3.0206px; animation-duration: 4.93149s, 13.8334s; animation-delay: 5.10094s, 4.35107s;"></div><div class="star" style="left: 21.9304vw; top: 41.3966vh; width: 0.715033px; height: 0.715033px; animation-duration: 4.33581s, 24.3073s; animation-delay: 1.94857s, 7.35031s;"></div><div class="star" style="left: 15.6294vw; top: 3.46585vh; width: 1.37877px; height: 1.37877px; animation-duration: 4.58077s, 28.5441s; animation-delay: 5.8632s, 5.76607s;"></div><div class="star" style="left: 17.6527vw; top: 81.3401vh; width: 1.46349px; height: 1.46349px; animation-duration: 5.83799s, 23.1885s; animation-delay: 2.01487s, 4.11052s;"></div><div class="star" style="left: 98.2453vw; top: 35.1956vh; width: 0.79795px; height: 0.79795px; animation-duration: 8.56887s, 13.0744s; animation-delay: 3.32885s, 2.94052s;"></div><div class="star" style="left: 91.1046vw; top: 86.906vh; width: 3.30253px; height: 3.30253px; animation-duration: 9.3923s, 13.3767s; animation-delay: 2.21589s, 9.60661s;"></div><div class="star" style="left: 57.606vw; top: 47.9787vh; width: 0.741919px; height: 0.741919px; animation-duration: 5.37747s, 13.5672s; animation-delay: 4.87714s, 1.76688s;"></div><div class="star" style="left: 21.5741vw; top: 43.7766vh; width: 1.43528px; height: 1.43528px; animation-duration: 8.43973s, 25.2006s; animation-delay: 5.84449s, 2.69014s;"></div><div class="star" style="left: 51.0025vw; top: 64.7666vh; width: 1.0529px; height: 1.0529px; animation-duration: 4.08718s, 19.0601s; animation-delay: 1.09095s, 7.32347s;"></div><div class="star" style="left: 4.23707vw; top: 67.1858vh; width: 1.61192px; height: 1.61192px; animation-duration: 4.32764s, 14.7649s; animation-delay: 5.83813s, 3.07345s;"></div><div class="star" style="left: 49.6639vw; top: 30.7724vh; width: 1.44782px; height: 1.44782px; animation-duration: 8.8536s, 23.6948s; animation-delay: 1.96806s, 5.08365s;"></div><div class="star" style="left: 90.5733vw; top: 4.57267vh; width: 2.17244px; height: 2.17244px; animation-duration: 4.65444s, 28.3128s; animation-delay: 5.85271s, 1.42163s;"></div><div class="star" style="left: 71.5486vw; top: 49.999vh; width: 1.56013px; height: 1.56013px; animation-duration: 7.23046s, 28.8444s; animation-delay: 0.288298s, 0.715558s;"></div><div class="star" style="left: 0.81698vw; top: 54.5934vh; width: 2.63992px; height: 2.63992px; animation-duration: 8.62719s, 17.9792s; animation-delay: 5.97562s, 0.70099s;"></div><div class="star" style="left: 24.2897vw; top: 79.8852vh; width: 1.23023px; height: 1.23023px; animation-duration: 7.5147s, 15.3219s; animation-delay: 4.17254s, 7.08873s;"></div><div class="star" style="left: 0.384881vw; top: 67.4958vh; width: 3.14051px; height: 3.14051px; animation-duration: 7.8765s, 23.0298s; animation-delay: 2.16386s, 7.63368s;"></div><div class="star" style="left: 81.8644vw; top: 22.3595vh; width: 1.81169px; height: 1.81169px; animation-duration: 6.14944s, 28.4788s; animation-delay: 3.53987s, 9.91772s;"></div><div class="star" style="left: 55.764vw; top: 57.7962vh; width: 3.30879px; height: 3.30879px; animation-duration: 4.24286s, 27.9002s; animation-delay: 0.0384361s, 7.84766s;"></div><div class="star" style="left: 92.9953vw; top: 7.87766vh; width: 1.9469px; height: 1.9469px; animation-duration: 5.30246s, 22.5025s; animation-delay: 3.22263s, 4.53682s;"></div><div class="star" style="left: 58.9488vw; top: 66.0623vh; width: 1.88611px; height: 1.88611px; animation-duration: 4.53302s, 12.1865s; animation-delay: 4.29412s, 6.20398s;"></div><div class="star" style="left: 12.1276vw; top: 47.1174vh; width: 2.13589px; height: 2.13589px; animation-duration: 8.69234s, 17.3492s; animation-delay: 1.76274s, 0.622246s;"></div><div class="star" style="left: 93.8416vw; top: 48.2027vh; width: 0.711895px; height: 0.711895px; animation-duration: 7.76845s, 27.5805s; animation-delay: 2.4293s, 2.69864s;"></div><div class="star" style="left: 74.3548vw; top: 9.41661vh; width: 1.12164px; height: 1.12164px; animation-duration: 7.81231s, 17.9172s; animation-delay: 3.56631s, 0.0941811s;"></div><div class="star" style="left: 75.6625vw; top: 1.35161vh; width: 1.9802px; height: 1.9802px; animation-duration: 9.53806s, 18.6052s; animation-delay: 3.82071s, 9.09469s;"></div><div class="star" style="left: 94.7558vw; top: 41.6344vh; width: 0.901047px; height: 0.901047px; animation-duration: 8.70356s, 23.9662s; animation-delay: 0.533337s, 0.121795s;"></div><div class="star" style="left: 41.5151vw; top: 44.0036vh; width: 1.45144px; height: 1.45144px; animation-duration: 9.53358s, 12.6822s; animation-delay: 0.919708s, 1.95606s;"></div><div class="star" style="left: 16.9951vw; top: 37.1986vh; width: 1.69306px; height: 1.69306px; animation-duration: 4.11344s, 14.4775s; animation-delay: 3.39313s, 8.33718s;"></div><div class="star" style="left: 21.6579vw; top: 26.9448vh; width: 1.566px; height: 1.566px; animation-duration: 5.16418s, 14.8423s; animation-delay: 1.19975s, 5.46215s;"></div><div class="star" style="left: 86.6702vw; top: 18.153vh; width: 1.0213px; height: 1.0213px; animation-duration: 4.90454s, 22.0448s; animation-delay: 4.56153s, 9.99972s;"></div><div class="star" style="left: 39.265vw; top: 38.7664vh; width: 1.04007px; height: 1.04007px; animation-duration: 5.59178s, 21.9976s; animation-delay: 5.23542s, 6.24534s;"></div><div class="star" style="left: 4.15487vw; top: 80.0585vh; width: 2.00879px; height: 2.00879px; animation-duration: 5.01944s, 17.541s; animation-delay: 4.30837s, 3.73541s;"></div><div class="star" style="left: 46.2443vw; top: 39.552vh; width: 1.27359px; height: 1.27359px; animation-duration: 4.93236s, 16.9172s; animation-delay: 2.28445s, 5.31846s;"></div><div class="star" style="left: 13.275vw; top: 44.0013vh; width: 0.88997px; height: 0.88997px; animation-duration: 9.64441s, 29.7693s; animation-delay: 0.764656s, 8.37316s;"></div><div class="star" style="left: 37.6689vw; top: 15.8771vh; width: 1.53088px; height: 1.53088px; animation-duration: 7.52021s, 12.8892s; animation-delay: 1.63999s, 3.68s;"></div><div class="star" style="left: 78.9357vw; top: 27.1445vh; width: 1.65398px; height: 1.65398px; animation-duration: 5.98396s, 12.1452s; animation-delay: 5.46878s, 9.27518s;"></div><div class="star" style="left: 53.5097vw; top: 2.36796vh; width: 2.16359px; height: 2.16359px; animation-duration: 8.04652s, 17.9113s; animation-delay: 1.26739s, 3.3792s;"></div><div class="star" style="left: 80.9726vw; top: 99.5009vh; width: 1.1506px; height: 1.1506px; animation-duration: 7.89973s, 12.5345s; animation-delay: 5.06546s, 8.0126s;"></div><div class="star" style="left: 79.4549vw; top: 74.7878vh; width: 1.56031px; height: 1.56031px; animation-duration: 7.74427s, 23.2257s; animation-delay: 0.201054s, 6.1752s;"></div><div class="star" style="left: 1.86989vw; top: 31.9346vh; width: 3.58179px; height: 3.58179px; animation-duration: 8.69563s, 13.0601s; animation-delay: 5.77235s, 4.95113s;"></div><div class="star" style="left: 44.4419vw; top: 20.8424vh; width: 1.28787px; height: 1.28787px; animation-duration: 7.13379s, 13.8692s; animation-delay: 5.87168s, 1.95685s;"></div><div class="star" style="left: 24.6794vw; top: 57.0992vh; width: 3.15386px; height: 3.15386px; animation-duration: 6.45335s, 26.0425s; animation-delay: 1.53246s, 9.58531s;"></div><div class="star" style="left: 91.3731vw; top: 70.6637vh; width: 1.39347px; height: 1.39347px; animation-duration: 4.01497s, 25.1s; animation-delay: 2.43334s, 6.62215s;"></div><div class="star" style="left: 65.2842vw; top: 7.17647vh; width: 1.21727px; height: 1.21727px; animation-duration: 6.12801s, 18.0158s; animation-delay: 5.47589s, 0.518992s;"></div><div class="star" style="left: 48.444vw; top: 97.9173vh; width: 1.87371px; height: 1.87371px; animation-duration: 7.66919s, 13.0419s; animation-delay: 3.06317s, 7.38851s;"></div><div class="star" style="left: 86.41vw; top: 87.8502vh; width: 2.01829px; height: 2.01829px; animation-duration: 4.7526s, 19.6241s; animation-delay: 3.08393s, 4.47905s;"></div><div class="star" style="left: 35.2007vw; top: 58.6319vh; width: 1.49053px; height: 1.49053px; animation-duration: 8.58457s, 27.3118s; animation-delay: 0.992347s, 8.76753s;"></div><div class="star" style="left: 13.7532vw; top: 23.6157vh; width: 0.942273px; height: 0.942273px; animation-duration: 8.10417s, 29.6702s; animation-delay: 5.61467s, 3.53854s;"></div><div class="star" style="left: 78.3104vw; top: 32.7468vh; width: 2.46705px; height: 2.46705px; animation-duration: 4.73323s, 14.8369s; animation-delay: 5.23989s, 6.22785s;"></div><div class="star" style="left: 3.22443vw; top: 33.3686vh; width: 1.13236px; height: 1.13236px; animation-duration: 5.99075s, 21.4696s; animation-delay: 5.41341s, 0.0112216s;"></div><div class="star" style="left: 61.8733vw; top: 67.0216vh; width: 0.948615px; height: 0.948615px; animation-duration: 5.19679s, 21.8478s; animation-delay: 2.76152s, 0.96046s;"></div><div class="star" style="left: 53.7094vw; top: 61.1779vh; width: 1.80983px; height: 1.80983px; animation-duration: 8.51072s, 12.79s; animation-delay: 1.16995s, 6.35326s;"></div><div class="star" style="left: 92.9546vw; top: 78.3261vh; width: 1.37207px; height: 1.37207px; animation-duration: 5.28421s, 26.8861s; animation-delay: 2.20547s, 8.26458s;"></div><div class="star" style="left: 54.9795vw; top: 86.4236vh; width: 2.43604px; height: 2.43604px; animation-duration: 7.15481s, 16.8038s; animation-delay: 0.661016s, 8.40722s;"></div><div class="star" style="left: 36.4329vw; top: 51.8942vh; width: 1.98601px; height: 1.98601px; animation-duration: 7.89775s, 15.6213s; animation-delay: 3.21424s, 3.78087s;"></div><div class="star" style="left: 45.0849vw; top: 0.0900004vh; width: 1.97703px; height: 1.97703px; animation-duration: 9.92429s, 29.9345s; animation-delay: 3.61504s, 2.23988s;"></div><div class="star" style="left: 58.7067vw; top: 72.8769vh; width: 1.9089px; height: 1.9089px; animation-duration: 8.81101s, 14.4139s; animation-delay: 1.85227s, 4.58059s;"></div><div class="star" style="left: 82.6791vw; top: 7.03015vh; width: 1.41076px; height: 1.41076px; animation-duration: 9.14606s, 12.4625s; animation-delay: 1.99806s, 3.17688s;"></div><div class="star" style="left: 5.65878vw; top: 59.9224vh; width: 2.18199px; height: 2.18199px; animation-duration: 7.82417s, 28.6163s; animation-delay: 5.44995s, 5.53675s;"></div><div class="star" style="left: 78.377vw; top: 32.472vh; width: 0.736692px; height: 0.736692px; animation-duration: 5.17182s, 16.8391s; animation-delay: 5.49532s, 5.81333s;"></div><div class="star" style="left: 30.1404vw; top: 17.6908vh; width: 1.12819px; height: 1.12819px; animation-duration: 5.27219s, 19.8317s; animation-delay: 5.55206s, 8.49682s;"></div><div class="star" style="left: 66.4419vw; top: 30.9544vh; width: 2.10602px; height: 2.10602px; animation-duration: 5.24353s, 18.754s; animation-delay: 2.58777s, 2.40372s;"></div><div class="star" style="left: 68.2986vw; top: 15.3749vh; width: 1.24318px; height: 1.24318px; animation-duration: 6.37451s, 24.6252s; animation-delay: 2.24604s, 6.07781s;"></div><div class="star" style="left: 83.752vw; top: 54.1385vh; width: 2.39017px; height: 2.39017px; animation-duration: 8.91172s, 26.2015s; animation-delay: 1.65728s, 2.38739s;"></div><div class="star" style="left: 63.9132vw; top: 42.512vh; width: 0.707977px; height: 0.707977px; animation-duration: 9.2387s, 19.3084s; animation-delay: 1.74979s, 9.18354s;"></div><div class="star" style="left: 66.09vw; top: 46.7266vh; width: 1.56863px; height: 1.56863px; animation-duration: 6.80109s, 23.0058s; animation-delay: 2.26326s, 4.01619s;"></div><div class="star" style="left: 13.956vw; top: 16.6031vh; width: 1.09543px; height: 1.09543px; animation-duration: 5.03718s, 24.4415s; animation-delay: 4.80307s, 7.21264s;"></div><div class="star" style="left: 59.6559vw; top: 44.6318vh; width: 1.55596px; height: 1.55596px; animation-duration: 7.52584s, 13.8457s; animation-delay: 3.08064s, 5.23853s;"></div><div class="star" style="left: 24.1785vw; top: 41.7663vh; width: 1.44636px; height: 1.44636px; animation-duration: 7.4963s, 17.0695s; animation-delay: 3.00198s, 1.41358s;"></div><div class="star" style="left: 79.2145vw; top: 49.2935vh; width: 1.18344px; height: 1.18344px; animation-duration: 8.62108s, 22.6328s; animation-delay: 2.13223s, 4.60534s;"></div><div class="star" style="left: 50.3095vw; top: 53.2376vh; width: 1.46027px; height: 1.46027px; animation-duration: 6.6182s, 29.5506s; animation-delay: 2.16803s, 7.21165s;"></div><div class="star" style="left: 57.6139vw; top: 42.1124vh; width: 0.863688px; height: 0.863688px; animation-duration: 7.37678s, 16.7134s; animation-delay: 2.91356s, 5.9483s;"></div><div class="star" style="left: 70.4894vw; top: 75.4767vh; width: 1.66258px; height: 1.66258px; animation-duration: 8.4584s, 17.3627s; animation-delay: 2.12326s, 0.288127s;"></div><div class="star" style="left: 62.3864vw; top: 91.5977vh; width: 2.09048px; height: 2.09048px; animation-duration: 9.57169s, 28.6395s; animation-delay: 1.55746s, 9.89104s;"></div><div class="star" style="left: 76.8769vw; top: 36.9111vh; width: 2.11926px; height: 2.11926px; animation-duration: 4.70791s, 18.1981s; animation-delay: 0.618973s, 9.14988s;"></div><div class="star" style="left: 14.852vw; top: 39.3744vh; width: 1.24159px; height: 1.24159px; animation-duration: 5.05895s, 21.3871s; animation-delay: 2.83442s, 9.98755s;"></div><div class="star" style="left: 55.3688vw; top: 87.7494vh; width: 2.17284px; height: 2.17284px; animation-duration: 5.87001s, 15.6937s; animation-delay: 0.0399695s, 9.44041s;"></div><div class="star" style="left: 37.1455vw; top: 68.2985vh; width: 1.23656px; height: 1.23656px; animation-duration: 8.30935s, 16.3336s; animation-delay: 0.916103s, 2.09215s;"></div><div class="star" style="left: 92.999vw; top: 15.8923vh; width: 1.9182px; height: 1.9182px; animation-duration: 6.12718s, 23.3169s; animation-delay: 2.86746s, 4.17231s;"></div><div class="star" style="left: 45.7126vw; top: 56.3303vh; width: 2.4283px; height: 2.4283px; animation-duration: 6.12977s, 27.1104s; animation-delay: 1.37664s, 5.31357s;"></div><div class="star" style="left: 2.60608vw; top: 11.9959vh; width: 1.43388px; height: 1.43388px; animation-duration: 5.26761s, 12.8829s; animation-delay: 4.77716s, 7.11236s;"></div><div class="star" style="left: 89.4588vw; top: 73.4458vh; width: 0.720858px; height: 0.720858px; animation-duration: 8.79707s, 16.4846s; animation-delay: 3.48864s, 0.727864s;"></div><div class="star" style="left: 94.3419vw; top: 53.7645vh; width: 1.81608px; height: 1.81608px; animation-duration: 9.62614s, 17.7944s; animation-delay: 5.01936s, 7.81943s;"></div><div class="star" style="left: 16.463vw; top: 60.7778vh; width: 1.46029px; height: 1.46029px; animation-duration: 8.50225s, 26.7407s; animation-delay: 0.977437s, 0.0101876s;"></div><div class="star" style="left: 29.137vw; top: 67.4392vh; width: 0.949538px; height: 0.949538px; animation-duration: 7.57637s, 25.7357s; animation-delay: 2.53459s, 2.419s;"></div><div class="star" style="left: 19.0008vw; top: 11.4797vh; width: 2.43898px; height: 2.43898px; animation-duration: 6.27624s, 29.6753s; animation-delay: 3.65565s, 7.90529s;"></div><div class="star" style="left: 48.3438vw; top: 11.4989vh; width: 2.20996px; height: 2.20996px; animation-duration: 6.83467s, 28.4237s; animation-delay: 5.19946s, 2.09924s;"></div><div class="star" style="left: 36.3427vw; top: 89.9719vh; width: 2.46222px; height: 2.46222px; animation-duration: 9.0871s, 22.9133s; animation-delay: 1.47173s, 4.92519s;"></div><div class="star" style="left: 43.3386vw; top: 0.8418vh; width: 0.934052px; height: 0.934052px; animation-duration: 8.81189s, 14.5084s; animation-delay: 5.21586s, 6.95445s;"></div><div class="star" style="left: 85.8554vw; top: 74.6992vh; width: 1.16926px; height: 1.16926px; animation-duration: 8.63716s, 22.7456s; animation-delay: 0.300428s, 6.10644s;"></div><div class="star" style="left: 78.3828vw; top: 88.4201vh; width: 1.99675px; height: 1.99675px; animation-duration: 6.82161s, 26.6376s; animation-delay: 4.4539s, 0.937679s;"></div><div class="star" style="left: 98.8215vw; top: 1.92424vh; width: 1.93482px; height: 1.93482px; animation-duration: 6.41016s, 22.4549s; animation-delay: 2.97014s, 0.850254s;"></div><div class="star" style="left: 93.4839vw; top: 94.2809vh; width: 2.34723px; height: 2.34723px; animation-duration: 6.90948s, 27.9519s; animation-delay: 4.67621s, 7.3189s;"></div><div class="star" style="left: 67.2192vw; top: 31.807vh; width: 1.92957px; height: 1.92957px; animation-duration: 8.96439s, 19.7081s; animation-delay: 2.22348s, 1.05138s;"></div><div class="star" style="left: 68.7249vw; top: 44.1368vh; width: 2.14035px; height: 2.14035px; animation-duration: 5.26604s, 15.4598s; animation-delay: 0.733702s, 5.08969s;"></div><div class="star" style="left: 19.0718vw; top: 89.9578vh; width: 2.93697px; height: 2.93697px; animation-duration: 6.04075s, 12.7042s; animation-delay: 5.09038s, 2.5082s;"></div><div class="star" style="left: 45.6644vw; top: 74.8072vh; width: 1.42466px; height: 1.42466px; animation-duration: 9.52689s, 18.0488s; animation-delay: 3.13047s, 0.791455s;"></div><div class="star" style="left: 57.3816vw; top: 85.4588vh; width: 1.7781px; height: 1.7781px; animation-duration: 9.24434s, 22.4242s; animation-delay: 1.9563s, 9.3205s;"></div><div class="star" style="left: 95.9184vw; top: 22.3145vh; width: 1.80989px; height: 1.80989px; animation-duration: 4.91604s, 17.8866s; animation-delay: 2.06094s, 5.69646s;"></div><div class="star" style="left: 66.4635vw; top: 2.43718vh; width: 2.08144px; height: 2.08144px; animation-duration: 4.63668s, 16.814s; animation-delay: 5.18363s, 0.0643463s;"></div><div class="star" style="left: 79.4823vw; top: 83.7616vh; width: 0.983573px; height: 0.983573px; animation-duration: 6.78173s, 16.8733s; animation-delay: 0.535852s, 9.11985s;"></div><div class="star" style="left: 70.4456vw; top: 66.552vh; width: 2.00142px; height: 2.00142px; animation-duration: 9.86902s, 13.9345s; animation-delay: 2.87594s, 4.01443s;"></div><div class="star" style="left: 46.5919vw; top: 56.789vh; width: 1.40218px; height: 1.40218px; animation-duration: 4.00983s, 26.0406s; animation-delay: 2.9132s, 7.56799s;"></div><div class="star" style="left: 38.4281vw; top: 87.6188vh; width: 3.45697px; height: 3.45697px; animation-duration: 9.69023s, 17.8114s; animation-delay: 5.80578s, 0.318749s;"></div><div class="star" style="left: 6.29276vw; top: 48.102vh; width: 1.88545px; height: 1.88545px; animation-duration: 4.47929s, 16.7834s; animation-delay: 0.03515s, 7.66035s;"></div><div class="star" style="left: 93.4275vw; top: 13.4609vh; width: 1.36528px; height: 1.36528px; animation-duration: 8.44097s, 15.3731s; animation-delay: 3.2508s, 7.98974s;"></div><div class="star" style="left: 64.5321vw; top: 57.7983vh; width: 1.20175px; height: 1.20175px; animation-duration: 5.3947s, 13.7569s; animation-delay: 3.60432s, 8.80288s;"></div><div class="star" style="left: 89.6743vw; top: 47.6431vh; width: 0.780121px; height: 0.780121px; animation-duration: 6.90256s, 18.0581s; animation-delay: 4.34974s, 3.88115s;"></div><div class="star" style="left: 42.0068vw; top: 11.268vh; width: 2.28307px; height: 2.28307px; animation-duration: 4.44054s, 27.6487s; animation-delay: 2.89779s, 9.38626s;"></div><div class="star" style="left: 29.7966vw; top: 21.3163vh; width: 1.5973px; height: 1.5973px; animation-duration: 5.88895s, 19.5422s; animation-delay: 4.54385s, 8.86101s;"></div><div class="fog-layer" style="opacity: 0.103601; animation-duration: 42.4683s; top: 9.87444vh;"></div><div class="fog-layer" style="opacity: 0.209443; animation-duration: 53.0649s; top: 35.7257vh;"></div><div class="fog-layer" style="opacity: 0.26862; animation-duration: 63.9642s; top: 60.9651vh;"></div></div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" style="display: none;">
+        <div class="modal-content neumorphic">
+            <div class="modal-header">
+                <h3 id="settingsTitle">Settings</h3>
+                <button id="closeSettingsBtn" aria-label="Close settings" class="close-btn">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <label for="langSelect">Language</label>
+                    <select id="langSelect">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="hi">हिन्दी</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="switch-label"><input type="checkbox" id="reduceMotionToggle"> Reduce motion</label>
+                </div>
+                <div class="form-row">
+                    <strong>Notifications</strong>
+                    <label class="switch-label"><input type="checkbox" id="notifyRainToggle"> Rain soon</label>
+                    <label class="switch-label"><input type="checkbox" id="notifyUvToggle"> High UV</label>
+                </div>
+                <div class="form-row">
+                    <strong>Activity preferences</strong>
+                    <label>Comfort temp min <input type="number" id="prefTempMin" value="10"></label>
+                    <label>Comfort temp max <input type="number" id="prefTempMax" value="30"></label>
+                    <label>Max wind (kph) <input type="number" id="prefMaxWind" value="25"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettingsBtn" class="neumorphic">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer=""></script>
+    <!-- SunCalc for moon phase/tithi calculations -->
+    <script src="https://unpkg.com/suncalc@1.9.0/suncalc.js" defer=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer=""></script>
+    <script src="script.js" defer=""></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').catch(() => {});
+        });
+      }
+    </script>
+
+
+</body></html>
