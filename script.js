@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- API KEYS & CONFIGURATION ---
   // WeatherAPI.com Key for weather data
-  const API_KEY = "314f1390e38048d3ba1182817250808";
+  const API_KEY = "Your_api_key";
   const BASE_URL = "https://api.weatherapi.com/v1";
   // OpenWeather Maps API key (tiles)
-  const OPENWEATHER_MAP_KEY = "0ec27aacec1774f2c8a3385c3f1bb395";
+  const OPENWEATHER_MAP_KEY = "Your_key";
 
   const RESPONSE_TTL_MS = 10 * 60 * 1000; // 10 minutes
   const AUTO_REFRESH_MS = 12 * 60 * 1000; // 12 minutes
